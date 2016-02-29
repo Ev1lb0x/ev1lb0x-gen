@@ -9,18 +9,18 @@ pacman -S git
 
 git clone https://github.com/x11tete11x/evil-pii.git
 
-cd evil-pii/
+cd ev1lb0x-gen/
 
-chmod +x ev1l-pii.gen
+chmod +x ev1lb0x-gen
 ```
 Setup the script
 ==================
 You need to edit configuration parameters as your desire
 ```
-nano ev1l-pii.gen
+nano ev1lb0x-gen
 ```
 Running the script
 ==================
 ```
-./ev1l-pii.gen
+./ev1lb0x-gen
 ```
