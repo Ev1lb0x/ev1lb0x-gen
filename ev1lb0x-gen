@@ -1,0 +1,175 @@
+#!/bin/bash
+
+##Config Settings
+LANGUAGE="es_AR"
+TIMEZONE="America/Argentina/Buenos_Aires"
+HOSTNAME="Ev1l-B0x"
+
+
+#Actualizar Pacman
+echo -e "\e[1;32mUpdating pacman..."
+echo -e "\e[0m"
+
+pacman -Sy --noconfirm pacman
+pacman-db-upgrade
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+#Actualizar Sistema entero
+echo -e "\e[1;32mUpdating your System..."
+echo -e "\e[0m"
+
+pacman -Syu --noconfirm base-devel sudo wget git curl
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+#WIFI Stuff
+echo -e "\e[1;32mInstalling Wifi stuff (to connect via netctl from cli)"
+echo -e "\e[0m"
+
+pacman -S --noconfirm dialog wpa_supplicant wireless_tools net-tools rfkill
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+
+#Localizacion
+echo -e "\e[1;32mSetting Localization..."
+echo -e "\e[0m"
+
+
+sed -i 's/#en_US/en_US/g' /etc/locale.gen
+sed -i 's/#$LANGUAGE/$LANGUAGE/g' /etc/locale.gen
+locale-gen
+UTF=".UTF-8"
+SETLANG="$LANGUAGE$UTF"
+localectl set-locale LANG=$SETLANG
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+
+#Localtime
+echo
+echo -e "\e[1;32mSetting TimeZone..."
+echo -e "\e[0m"
+
+rm /etc/localtime
+ln -s /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+echo $TIMEZONE > /etc/timezone
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+
+#Fix ssh to enter as root
+echo
+echo -e "\e[1;32mFixing ssh to enter as root..."
+echo -e "\e[0m"
+
+echo "PermitRootLogin yes" >> /etc/ssh/ssh_config
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+
+#Set Hostname
+echo -e "\e[1;32mSetting Hostname..."
+echo -e "\e[0m"
+
+hostnamectl set-hostname $HOSTNAME
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+
+#Usuario
+echo -e "\e[1;32mAdding a "pi" user with "raspberry" password..."
+echo -e "\e[0m"
+
+useradd -m -g users -G video,audio,disk,wheel,games,network,optical,storage,scanner,power -s /bin/bash pi
+echo "pi:raspberry" | chpasswd
+sed -i 's/# %wheel ALL=(ALL) NOPASSWD: ALL/pi ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
+
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+#Ruby
+echo -e "\e[1;32mSetting up ruby..."
+echo -e "\e[0m"
+
+pacman -S --noconfirm ruby
+echo 'PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"' >> /root/.bashrc
+echo 'PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"' >> /home/pi/.bashrc
+chown pi /home/pi/.bashrc
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+#Bettercap
+echo -e "\e[1;32mSetting up Bettercap..."
+echo -e "\e[0m"
+
+pacman -S --noconfirm libpcap
+cd /opt
+git clone https://github.com/evilsocket/bettercap
+cd bettercap
+gem build bettercap.gemspec
+gem install bettercap*.gem
+
+echo 'alias bettercap="/opt/bettercap/bin/bettercap"' >> /root/.bashrc
+echo 'alias bettercap="/opt/bettercap/bin/bettercap"' >> /home/pi/.bashrc
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"
+
+
+
+#Wifite
+echo -e "\e[1;32mSetting up Wifite..."
+echo -e "\e[0m"
+
+pacman -S --noconfirm cowpatty macchanger pyrit python2 aircrack-ng wireshark-cli
+cd /tmp
+git clone https://github.com/Archberry/pixiewps-git.git
+cd pixiewps-git    
+chown -R pi /tmp/pixiewps-git           
+runuser -l pi -c 'cd /tmp/pixiewps-git && makepkg --noconfirm -sic'
+cd /tmp
+git clone https://github.com/Archberry/reaver-wps-fork-t6x-git.git
+cd reaver-wps-fork-t6x-git   
+chown -R pi /tmp/reaver-wps-fork-t6x-git
+runuser -l pi -c 'cd /tmp/reaver-wps-fork-t6x-git/ && makepkg --noconfirm -sic'
+mkdir -p /opt/wifite
+cd /opt/wifite
+wget https://raw.github.com/derv82/wifite/master/wifite.py
+echo 'alias wifite="python2 /opt/wifite/wifite.py"' >> /root/.bashrc
+echo 'alias wifite="python2 /opt/wifite/wifite.py"' >> /home/pi/.bashrc
+
+echo
+echo -e "\e[1;31mDone!"
+
+#Clean
+echo -e "\e[1;32mCleaning alarm user..."
+echo -e "\e[0m"
+echo -e "\e[0m"
+
+userdel alarm
+rm -rf /home/alarm
+
+echo
+echo -e "\e[1;31mDone!"
+echo -e "\e[0m"

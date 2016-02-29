@@ -7,7 +7,7 @@ Installation
 ```
 pacman -S git
 
-git clone https://github.com/x11tete11x/evil-pii.git
+git clone https://github.com/Ev1lb0x/ev1lb0x-gen.git
 
 cd ev1lb0x-gen/
 
