@@ -144,12 +144,12 @@ echo -e "\e[0m"
 
 pacman -S --noconfirm cowpatty macchanger pyrit python2 aircrack-ng wireshark-cli
 cd /tmp
-git clone https://github.com/Archberry/pixiewps-git.git
+git clone https://github.com/Ev1lb0x/pixiewps-git.git
 cd pixiewps-git    
 chown -R pi /tmp/pixiewps-git           
 runuser -l pi -c 'cd /tmp/pixiewps-git && makepkg --noconfirm -sic'
 cd /tmp
-git clone https://github.com/Archberry/reaver-wps-fork-t6x-git.git
+git clone https://github.com/Ev1lb0x/reaver-wps-fork-t6x-git.git
 cd reaver-wps-fork-t6x-git   
 chown -R pi /tmp/reaver-wps-fork-t6x-git
 runuser -l pi -c 'cd /tmp/reaver-wps-fork-t6x-git/ && makepkg --noconfirm -sic'
